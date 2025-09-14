@@ -38,16 +38,17 @@ class Hero:
     def turn_right(self):
         self.hero.setH((self.hero.getH() - 5) % 360)       
             
-    def move_to(self):
+    def move_to(self, angle):
         """обираємо яяк рухати гравця в залежності вфд режиму гри"""
         if self.game_mode:
-            self.just_move()
+            self.just_move(angle)
         else:
-            self.try_move()
+            self.try_move(angle)
     
-    def just_move(self):
+    def just_move(self, angle):
         """рух гравця в режимі спостерігача"""
-        pass
+        pos = self.look_at(angle)
+        self.hero.setPos(pos)
     
     def try_move(self):
         """рух гравця в основному ігровому режимі"""
@@ -88,10 +89,49 @@ class Hero:
            return -1, -1
        else:
            return 0, -1
-            
+
+    def look_at(self, angle):
+        x = round(self.hero.getX())
+        y = round(self.hero.getY())
+        z = round(self.hero.getZ())
+        
+        dx, dy = self.check_dir(angle)
+        
+        return x + dx, y + dy, z
+        
+    def forward(self):
+        angle = self.hero.getH() %360
+        self.move_to(angle)
+        
+    def left(self):
+        angle = (self.hero.getH() + 90) %360
+        self.move_to(angle)
+        
+    def right(self):
+        angle = (self.hero.getH() - 90) %360
+        self.move_to(angle)
+        
+    def back(self):
+        angle = (self.hero.getH() - 180) %360
+        self.move_to(angle)
+        
+    def up(self):
+        if self.game_mode:
+            self.hero.setZ(self.hero.getZ() + 1)
+        
+    def down(self):
+        if self.game_mode:
+            self.hero.setZ(self.hero.getZ() - 1)
+
     def accept_events(self):
         base.accept("c", self.switch_camera)
         base.accept('n', self.turn_left)
         base.accept('n' + "-repeat", self.turn_left)
         base.accept("m", self.turn_right)
         base.accept('m' + "-repeat", self.turn_right)
+        base.accept("w", self.forward)
+        base.accept("s", self.back)
+        base.accept("a",self.left)
+        base.accept("d", self.right)
+        base.accept("q", self.down)
+        base.accept("e", self.up)
