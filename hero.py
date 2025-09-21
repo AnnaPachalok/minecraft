@@ -32,6 +32,13 @@ class Hero:
         else:
             self.camera_bind()
             
+    def change_mode(self):
+        if self.game_mode:
+            self.game_mode = False
+        else:
+            self.game_mode = True        
+            
+            
     def turn_left(self):
         self.hero.setH((self.hero.getH() + 5) % 360)
         
@@ -50,9 +57,16 @@ class Hero:
         pos = self.look_at(angle)
         self.hero.setPos(pos)
     
-    def try_move(self):
+    def try_move(self, angle):
         """рух гравця в основному ігровому режимі"""
-        pass
+        pos = self.look_at(angle)
+        if self.land.is_empty(pos):
+            pos = self.land.find_highest_empty(pos)
+            self.hero.setPos(pos)
+        else:
+            pos = pos[0], pos[1], pos[2] + 1
+            if self.land.is_empty(pos):
+                self.hero.setPos(pos)
     
     def check_dir(self, angle):
        ''' повертає заокруглені зміни координат X, Y,
@@ -122,6 +136,22 @@ class Hero:
     def down(self):
         if self.game_mode:
             self.hero.setZ(self.hero.getZ() - 1)
+            
+    def build(self):
+        angle = self.hero.getH() %360
+        pos = self.look_at(angle)
+        if self.game_mode:
+            self.land.add_block(pos)
+        else:
+            self.land.build_block(pos)
+            
+    def destroy(self):
+        angle = self.hero.getH() %360
+        pos = self.look_at(angle)
+        if self.game_mode:
+            self.land.destroy_block(pos)
+        else:
+            self.land.del_block_from(pos)
 
     def accept_events(self):
         base.accept("c", self.switch_camera)
@@ -135,3 +165,6 @@ class Hero:
         base.accept("d", self.right)
         base.accept("q", self.down)
         base.accept("e", self.up)
+        base.accept("z", self.change_mode)
+        base.accept("v", self.build)
+        base.accept("b", self.destroy)
