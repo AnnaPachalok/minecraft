@@ -1,3 +1,5 @@
+import pickle
+
 class MapManager:
     def __init__(self):
         self.model = ("models/block.egg")
@@ -62,7 +64,11 @@ class MapManager:
         return (x, y, z)
     
     def build_block(self, pos):
-        pass
+        x, y, z = pos
+        new = self.find_highest_empty(pos)
+        if new[2] <= z + 1:
+            self.add_block(new)
+
     
     def destroy_block(self, pos):
         blocks = self.find_blocks(pos)
@@ -70,6 +76,29 @@ class MapManager:
             block.removeNode()
             
     def del_block_from(self, pos):
-        pass
+        x, y, z = self.find_highest_empty(pos)
+        pos = x, y, z - 1
+        blocks = self.find_blocks(pos)
+        for block in blocks:
+            block.removeNode()
+            
+    def save_map(self):
+        blocks = self.land.getChildren()
+        with open("my_map.dat", "wb") as file:
+            pickle.down(len(blocks), file)
+            for block in blocks:
+                x, y, z = block.getPos()
+                pos = (int(x), int(y), int(z))
+                pickle.dump(pos, file)
+                
+    def load_map_from_file(self):
+        with open("my_map.dat", "rb") as file:
+            lenght = pickle.load(file)
+            for i in range(lenght):
+                pos = pickle.load(file)
+                self.add_block(pos)
+            
+            
+
     
     

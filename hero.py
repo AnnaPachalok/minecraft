@@ -168,3 +168,5 @@ class Hero:
         base.accept("z", self.change_mode)
         base.accept("v", self.build)
         base.accept("b", self.destroy)
+        base.accept("l", self.land.load_map_from_file())
+        base.accept("k", self.land.save_map)
